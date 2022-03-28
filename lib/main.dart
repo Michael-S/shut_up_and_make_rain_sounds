@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/services.dart';
 import 'dart:typed_data';
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Shut Up and Make It Rain',
+      title: 'Shut Up And Make Rain Sounds',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -27,7 +30,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Shut Up and Make It Rain'),
+      home: const MyHomePage(title: 'Shut Up And Make Rain Sounds'),
     );
   }
 }
@@ -53,17 +56,23 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool _playingRainSounds = false;
   AudioPlayer player = AudioPlayer();
-  late Uint8List audiobytes;
+  String audioasset = "assets/audio/rain_and_thunder_public_domain.mp3";
 
   void _togglePlayingRainSounds() {
     setState(() {
       _playingRainSounds = !_playingRainSounds;
       if (_playingRainSounds) {
         Future.delayed(Duration.zero, () async {
-          player.playBytes(audiobytes);
-          player.onPlayerCompletion.listen((event) {
+          player.setReleaseMode(ReleaseMode.LOOP);
+          if (!kIsWeb && Platform.isAndroid) {
+            // For some reason, I can't get Android to play the asset locally.
+            // I am getting IOExceptions loading the file from the URL with player.play(audioasset, isLocal: true);
+            ByteData bytes = await rootBundle.load(audioasset); //load audio from assets
+            Uint8List audiobytes = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
             player.playBytes(audiobytes);
-          });
+          } else {
+            player.play(audioasset, isLocal: true);
+          }
         });
       } else {
         Future.delayed(Duration.zero, () async {
@@ -71,16 +80,6 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       }
     });
-  }
-
-  @override
-  void initState() {
-    Future.delayed(Duration.zero, () async {
-      String audioasset = "assets/audio/rain_and_thunder_public_domain.mp3";
-      ByteData bytes = await rootBundle.load(audioasset); //load audio from assets
-      audiobytes = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
-    });
-    super.initState();
   }
 
   @override

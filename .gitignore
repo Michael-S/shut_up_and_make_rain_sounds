@@ -44,3 +44,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# I start Android Studio with nohup ${PATH_TO_ANDROID_STUDIO}/bin/studio.sh &
+nohup.out
