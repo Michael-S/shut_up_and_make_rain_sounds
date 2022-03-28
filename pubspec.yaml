@@ -64,7 +64,9 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
-    - assets/audio/rain_and_thunder_public_domain.mp3
+    - assets/audio/rain_and_thunder_public_domain_1.mp3
+    - assets/audio/rain_and_thunder_public_domain_2.mp3
+    - assets/audio/rain_and_thunder_public_domain_3.mp3
     - assets/text/about_and_license.txt
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -44,8 +44,8 @@ class _AboutPageState extends State<AboutPage> {
   @override
   void initState() {
     Future.delayed(Duration.zero, () async {
-      final _loadedData = await rootBundle.loadString(
-          'assets/text/about_and_license.txt');
+      final _loadedData =
+          await rootBundle.loadString('assets/text/about_and_license.txt');
       setState(() {
         aboutContents = _loadedData;
       });
@@ -63,13 +63,12 @@ class _AboutPageState extends State<AboutPage> {
         child: ListView(
           children: <Widget>[
             ElevatedButton(
-                child: const Text('Back', style: TextStyle(color: Colors.black, fontSize: 28.0)),
+                child: const Text('Back',
+                    style: TextStyle(color: Colors.black, fontSize: 28.0)),
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const MyApp())
-                  ); }
-            ),
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const MyApp()));
+                }),
             //Text(aboutContents, style: const TextStyle(color: Colors.black, fontSize: 16.0)),
             Linkify(
               onOpen: (link) async {
@@ -82,15 +81,16 @@ class _AboutPageState extends State<AboutPage> {
               options: const LinkifyOptions(humanize: false),
               text: aboutContents,
               style: const TextStyle(color: Colors.black, fontSize: 14.0),
-              linkStyle: const TextStyle(color: Colors.blue, fontSize: 14.0, decoration: TextDecoration.underline),
+              linkStyle: const TextStyle(
+                  color: Colors.blue,
+                  fontSize: 14.0,
+                  decoration: TextDecoration.underline),
             ),
           ],
         ),
       ),
     );
   }
-
-
 }
 
 class MyHomePage extends StatefulWidget {
@@ -113,31 +113,77 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool _playingRainSounds = false;
+  int _playingIndex = 0;
   AudioPlayer player = AudioPlayer();
-  String audioasset = "assets/audio/rain_and_thunder_public_domain.mp3";
+  List<String> audioAssets = [
+    "assets/audio/rain_and_thunder_public_domain_1.mp3",
+    "assets/audio/rain_and_thunder_public_domain_2.mp3",
+    "assets/audio/rain_and_thunder_public_domain_3.mp3",
+  ];
 
-  void _togglePlayingRainSounds() {
+  Future playSound(int index) async {
+    player.setReleaseMode(ReleaseMode.LOOP);
+    if (!kIsWeb && Platform.isAndroid) {
+      // For some reason, I can't get Android to play the asset locally.
+      // I am getting IOExceptions loading the file from the URL with player.play(audioasset, isLocal: true);
+      ByteData bytes =
+          await rootBundle.load(audioAssets[index]); //load audio from assets
+      Uint8List audiobytes =
+          bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+      return player.playBytes(audiobytes);
+    } else {
+      return player.play(audioAssets[index], isLocal: true);
+    }
+  }
+
+  void _togglePlayingRainSounds(int index) {
     setState(() {
-      _playingRainSounds = !_playingRainSounds;
-      if (_playingRainSounds) {
-        Future.delayed(Duration.zero, () async {
-          player.setReleaseMode(ReleaseMode.LOOP);
-          if (!kIsWeb && Platform.isAndroid) {
-            // For some reason, I can't get Android to play the asset locally.
-            // I am getting IOExceptions loading the file from the URL with player.play(audioasset, isLocal: true);
-            ByteData bytes = await rootBundle.load(audioasset); //load audio from assets
-            Uint8List audiobytes = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
-            player.playBytes(audiobytes);
-          } else {
-            player.play(audioasset, isLocal: true);
-          }
-        });
-      } else {
+      if (_playingRainSounds && _playingIndex == index) {
+        // stop the current track
         Future.delayed(Duration.zero, () async {
           await player.stop();
         });
+        _playingRainSounds = false;
+      } else if (_playingRainSounds) {
+        // switch track
+        Future.delayed(Duration.zero, () async {
+          await player.stop().then((ignored) => playSound(index));
+        });
+        // _playingRainSounds stays true
+      } else {
+        Future.delayed(Duration.zero, () async {
+          await playSound(index);
+        });
+        _playingRainSounds = true;
       }
+      _playingIndex = index;
     });
+  }
+
+  void _togglePlayingRainSounds1() {
+    _togglePlayingRainSounds(0);
+  }
+
+  void _togglePlayingRainSounds2() {
+    _togglePlayingRainSounds(1);
+  }
+
+  void _togglePlayingRainSounds3() {
+    _togglePlayingRainSounds(2);
+  }
+
+  bool playingRainSoundsAtIndex(int index) {
+    return _playingRainSounds && _playingIndex == index;
+  }
+
+  String rainSoundsButtonText(int index) {
+    if (_playingRainSounds && _playingIndex == index) {
+      return "Stop Rain Sounds " + (index + 1).toString();
+    } else if (_playingRainSounds) {
+      return "Switch Rain Sounds " + (index + 1).toString();
+    } else {
+      return "Start Rain Sounds " + (index + 1).toString();
+    }
   }
 
   @override
@@ -174,22 +220,61 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ElevatedButton(
-                child: const Text('About', style: TextStyle(color: Colors.black, fontSize: 28.0)),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const AboutPage())
-                  ); }
+            Container(
+                padding: const EdgeInsets.all(10),
+                child: ElevatedButton(
+                    child: const Text('About',
+                        style: TextStyle(color: Colors.black, fontSize: 28.0)),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AboutPage()));
+                    })),
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: TextButton(
+                style: ButtonStyle(
+                  backgroundColor: playingRainSoundsAtIndex(0)
+                      ? MaterialStateProperty.all<Color>(Colors.red)
+                      : MaterialStateProperty.all<Color>(Colors.green),
+                  textStyle: MaterialStateProperty.all<TextStyle>(
+                      const TextStyle(fontSize: 28.0)),
+                ),
+                child: Text(rainSoundsButtonText(0),
+                    style: const TextStyle(color: Colors.black)),
+                onPressed: _togglePlayingRainSounds1,
+              ),
             ),
-           TextButton(
-              style: ButtonStyle(
-                backgroundColor: _playingRainSounds ? MaterialStateProperty.all<Color>(Colors.red) : MaterialStateProperty.all<Color>(Colors.green),
-                textStyle: MaterialStateProperty.all<TextStyle>(const TextStyle(fontSize: 28.0)),
-              ) ,
-              child: _playingRainSounds ? const Text("Stop Rain Sounds", style: TextStyle(color: Colors.black))
-                  : const Text("Start Rain Sounds", style: TextStyle(color: Colors.black)),
-              onPressed: _togglePlayingRainSounds,
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: TextButton(
+                style: ButtonStyle(
+                  backgroundColor: playingRainSoundsAtIndex(1)
+                      ? MaterialStateProperty.all<Color>(Colors.red)
+                      : MaterialStateProperty.all<Color>(Colors.green),
+                  textStyle: MaterialStateProperty.all<TextStyle>(
+                      const TextStyle(fontSize: 28.0)),
+                ),
+                child: Text(rainSoundsButtonText(1),
+                    style: const TextStyle(color: Colors.black)),
+                onPressed: _togglePlayingRainSounds2,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: TextButton(
+                style: ButtonStyle(
+                  backgroundColor: playingRainSoundsAtIndex(2)
+                      ? MaterialStateProperty.all<Color>(Colors.red)
+                      : MaterialStateProperty.all<Color>(Colors.green),
+                  textStyle: MaterialStateProperty.all<TextStyle>(
+                      const TextStyle(fontSize: 28.0)),
+                ),
+                child: Text(rainSoundsButtonText(2),
+                    style: const TextStyle(color: Colors.black)),
+                onPressed: _togglePlayingRainSounds3,
+              ),
             ),
           ],
         ),
