@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -61,14 +63,27 @@ class _AboutPageState extends State<AboutPage> {
         child: ListView(
           children: <Widget>[
             ElevatedButton(
-                child: const Text('Back To Main', style: TextStyle(color: Colors.black, fontSize: 28.0)),
+                child: const Text('Back', style: TextStyle(color: Colors.black, fontSize: 28.0)),
                 onPressed: () {
                   Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const MyApp())
                   ); }
             ),
-            Text(aboutContents, style: const TextStyle(color: Colors.black, fontSize: 16.0)),
+            //Text(aboutContents, style: const TextStyle(color: Colors.black, fontSize: 16.0)),
+            Linkify(
+              onOpen: (link) async {
+                if (await canLaunch(link.url)) {
+                  await launch(link.url);
+                } else {
+                  throw 'Could not launch $link';
+                }
+              },
+              options: const LinkifyOptions(humanize: false),
+              text: aboutContents,
+              style: const TextStyle(color: Colors.black, fontSize: 14.0),
+              linkStyle: const TextStyle(color: Colors.blue, fontSize: 14.0, decoration: TextDecoration.underline),
+            ),
           ],
         ),
       ),

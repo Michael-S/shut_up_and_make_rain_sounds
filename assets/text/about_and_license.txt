@@ -2,7 +2,11 @@ Shut Up and Make Rain Sounds
 
 No tracking, no advertisements, no nonsense.
 
-Built with Flutter, https://flutter.dev and uses the Dart audioplayers library https://github.com/bluefireteam/audioplayers
+Built with Flutter, https://flutter.dev
+Uses the Dart audioplayers library
+https://github.com/bluefireteam/audioplayers
+and the Dart linkify library
+https://github.com/Cretezy/flutter_linkify
 
 Source code: https://github.com/Michael-S/shut_up_and_make_rain_sounds
 
