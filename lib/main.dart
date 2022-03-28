@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:flutter/services.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
 }
 
@@ -20,19 +20,62 @@ class MyApp extends StatelessWidget {
       title: 'Shut Up And Make Rain Sounds',
       theme: ThemeData(
         // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+
+        primarySwatch: Colors.green,
       ),
       home: const MyHomePage(title: 'Shut Up And Make Rain Sounds'),
     );
   }
+}
+
+class AboutPage extends StatefulWidget {
+  const AboutPage({Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => _AboutPageState();
+}
+
+class _AboutPageState extends State<AboutPage> {
+  String aboutContents = "whatever";
+
+  //Future<void> _loadData() async {
+  @override
+  void initState() {
+    Future.delayed(Duration.zero, () async {
+      final _loadedData = await rootBundle.loadString(
+          'assets/text/about_and_license.txt');
+      setState(() {
+        aboutContents = _loadedData;
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('About Page'),
+      ),
+      body: Center(
+        child: ListView(
+          children: <Widget>[
+            ElevatedButton(
+                child: const Text('Back To Main', style: TextStyle(color: Colors.black, fontSize: 28.0)),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MyApp())
+                  ); }
+            ),
+            Text(aboutContents, style: const TextStyle(color: Colors.black, fontSize: 16.0)),
+          ],
+        ),
+      ),
+    );
+  }
+
+
 }
 
 class MyHomePage extends StatefulWidget {
@@ -116,6 +159,14 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            ElevatedButton(
+                child: const Text('About', style: TextStyle(color: Colors.black, fontSize: 28.0)),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AboutPage())
+                  ); }
+            ),
            TextButton(
               style: ButtonStyle(
                 backgroundColor: _playingRainSounds ? MaterialStateProperty.all<Color>(Colors.red) : MaterialStateProperty.all<Color>(Colors.green),
