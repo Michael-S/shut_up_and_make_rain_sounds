@@ -62,29 +62,33 @@ class _AboutPageState extends State<AboutPage> {
       body: Center(
         child: ListView(
           children: <Widget>[
-            ElevatedButton(
-                child: const Text('Back',
-                    style: TextStyle(color: Colors.black, fontSize: 28.0)),
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const MyApp()));
-                }),
-            //Text(aboutContents, style: const TextStyle(color: Colors.black, fontSize: 16.0)),
-            Linkify(
-              onOpen: (link) async {
-                if (await canLaunch(link.url)) {
-                  await launch(link.url);
-                } else {
-                  throw 'Could not launch $link';
-                }
-              },
-              options: const LinkifyOptions(humanize: false),
-              text: aboutContents,
-              style: const TextStyle(color: Colors.black, fontSize: 14.0),
-              linkStyle: const TextStyle(
-                  color: Colors.blue,
-                  fontSize: 14.0,
-                  decoration: TextDecoration.underline),
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: ElevatedButton(
+                  child: const Text('Back', style: TextStyle(fontSize: 28.0)),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => const MyApp()));
+                  }),
+            ),
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: Linkify(
+                onOpen: (link) async {
+                  if (await canLaunch(link.url)) {
+                    await launch(link.url);
+                  } else {
+                    throw 'Could not launch $link';
+                  }
+                },
+                options: const LinkifyOptions(humanize: false),
+                text: aboutContents,
+                style: const TextStyle(color: Colors.black, fontSize: 14.0),
+                linkStyle: const TextStyle(
+                    color: Colors.blue,
+                    fontSize: 14.0,
+                    decoration: TextDecoration.underline),
+              ),
             ),
           ],
         ),
@@ -120,6 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
     "assets/audio/rain_and_thunder_public_domain_2.mp3",
     "assets/audio/rain_and_thunder_public_domain_3.mp3",
   ];
+  double _buttonPadding = 25.0;
 
   Future playSound(int index) async {
     player.setReleaseMode(ReleaseMode.LOOP);
@@ -178,11 +183,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String rainSoundsButtonText(int index) {
     if (_playingRainSounds && _playingIndex == index) {
-      return "Stop Rain Sounds " + (index + 1).toString();
+      return "Stop All Rain Sounds";
     } else if (_playingRainSounds) {
-      return "Switch Rain Sounds " + (index + 1).toString();
+      return "Switch To Rain Sound " + (index + 1).toString();
     } else {
-      return "Start Rain Sounds " + (index + 1).toString();
+      return "Start Rain Sound " + (index + 1).toString();
     }
   }
 
@@ -221,58 +226,58 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(_buttonPadding),
                 child: ElevatedButton(
-                    child: const Text('About',
-                        style: TextStyle(color: Colors.black, fontSize: 28.0)),
+                    child:
+                        const Text('About', style: TextStyle(fontSize: 28.0)),
                     onPressed: () {
+                      if (_playingRainSounds) {
+                        _togglePlayingRainSounds(_playingIndex);
+                      }
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const AboutPage()));
                     })),
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(_buttonPadding),
               child: TextButton(
                 style: ButtonStyle(
                   backgroundColor: playingRainSoundsAtIndex(0)
                       ? MaterialStateProperty.all<Color>(Colors.red)
                       : MaterialStateProperty.all<Color>(Colors.green),
-                  textStyle: MaterialStateProperty.all<TextStyle>(
-                      const TextStyle(fontSize: 28.0)),
                 ),
                 child: Text(rainSoundsButtonText(0),
-                    style: const TextStyle(color: Colors.black)),
+                    style:
+                        const TextStyle(color: Colors.white, fontSize: 28.0)),
                 onPressed: _togglePlayingRainSounds1,
               ),
             ),
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(_buttonPadding),
               child: TextButton(
                 style: ButtonStyle(
                   backgroundColor: playingRainSoundsAtIndex(1)
                       ? MaterialStateProperty.all<Color>(Colors.red)
                       : MaterialStateProperty.all<Color>(Colors.green),
-                  textStyle: MaterialStateProperty.all<TextStyle>(
-                      const TextStyle(fontSize: 28.0)),
                 ),
                 child: Text(rainSoundsButtonText(1),
-                    style: const TextStyle(color: Colors.black)),
+                    style:
+                        const TextStyle(color: Colors.white, fontSize: 28.0)),
                 onPressed: _togglePlayingRainSounds2,
               ),
             ),
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(_buttonPadding),
               child: TextButton(
                 style: ButtonStyle(
                   backgroundColor: playingRainSoundsAtIndex(2)
                       ? MaterialStateProperty.all<Color>(Colors.red)
                       : MaterialStateProperty.all<Color>(Colors.green),
-                  textStyle: MaterialStateProperty.all<TextStyle>(
-                      const TextStyle(fontSize: 28.0)),
                 ),
                 child: Text(rainSoundsButtonText(2),
-                    style: const TextStyle(color: Colors.black)),
+                    style:
+                        const TextStyle(color: Colors.white, fontSize: 28.0)),
                 onPressed: _togglePlayingRainSounds3,
               ),
             ),
