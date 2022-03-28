@@ -12,3 +12,6 @@ Built with Flutter ( https://flutter.dev/ ) and the Dart audioplayers package
 Included audio file was from Wikipedia and in the public domain, originally in OGG
 format and I used ffmpeg to convert it to mp3.
 
+A web demo of the app (though I'm not sure how long it will stay available) is at
+https://f2fi3yxr5l9lowmzgyw5.ducky.sandcats.io
+
