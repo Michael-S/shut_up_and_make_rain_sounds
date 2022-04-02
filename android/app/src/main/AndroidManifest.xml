@@ -3,7 +3,7 @@
    <application
         android:label="shutupandmakeitrain"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/rain_sounds">
         <activity
             android:name=".MainActivity"
             android:exported="true"
