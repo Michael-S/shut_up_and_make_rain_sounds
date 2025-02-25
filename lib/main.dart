@@ -4,7 +4,6 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:typed_data';
 import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:flutter/services.dart';
 
@@ -127,18 +126,13 @@ class _MyHomePageState extends State<MyHomePage> {
   double _buttonPadding = 25.0;
 
   Future playSound(int index) async {
-    player.setReleaseMode(ReleaseMode.LOOP);
-    if (!kIsWeb && Platform.isAndroid) {
-      // For some reason, I can't get Android to play the asset locally.
-      // I am getting IOExceptions loading the file from the URL with player.play(audioasset, isLocal: true);
-      ByteData bytes =
-          await rootBundle.load(audioAssets[index]); //load audio from assets
-      Uint8List audiobytes =
-          bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
-      return player.playBytes(audiobytes);
-    } else {
-      return player.play(audioAssets[index], isLocal: true);
-    }
+    player.setReleaseMode(ReleaseMode.loop);
+    ByteData bytes =
+        await rootBundle.load(audioAssets[index]); //load audio from assets
+    Uint8List audiobytes =
+        bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+    BytesSource bytesSource = BytesSource(audiobytes);
+    return player.play(bytesSource);
   }
 
   void _togglePlayingRainSounds(int index) {
